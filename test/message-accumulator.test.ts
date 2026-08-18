@@ -84,4 +84,26 @@ describe('MessageAccumulator', () => {
     acc.finalize()
     expect((acc.messages[0]!.content[0] as any).is_error).toBe(true)
   })
+
+  it('finalize synthesizes error tool_results for tool_use blocks left dangling by abort', async () => {
+    // 复现 abort 窗口：assistant 消息含 2 个 tool_use，只有 t1 跑完并缓冲了 tool_result，
+    // t2 在执行前/中 abort——finalize 必须给 t2 补一个 is_error 的 tool_result，保证 messages 可续接。
+    const acc = new MessageAccumulator([{ role: 'user', content: [{ type: 'text', text: 'go' }] }])
+    acc.messages.push({ role: 'assistant', content: [
+      { type: 'tool_use', id: 't1', name: 'q', input: {} },
+      { type: 'tool_use', id: 't2', name: 'q', input: {} },
+    ] })
+    await acc.wrapTool(scriptedTool('q', { ok: 1 })).execute({}, ctxFor('t1'))   // 只有 t1 完成
+    acc.finalize()
+    const userTurn = acc.messages.at(-1)!
+    expect(userTurn.role).toBe('user')
+    expect(userTurn.content).toHaveLength(2)                                     // t1 真实 + t2 合成
+    const [real, synth] = userTurn.content as any[]
+    expect(real.tool_use_id).toBe('t1'); expect(real.is_error).toBeUndefined()
+    expect(synth.tool_use_id).toBe('t2'); expect(synth.is_error).toBe(true)      // ← 悬空 tool_use 被补上
+    // 两个 assistant tool_use 都有配对 tool_result（可续接不变式）
+    const ids = acc.messages.flatMap(m => m.content).filter((b: any) => b.type === 'tool_result').map((b: any) => b.tool_use_id)
+    const uses = acc.messages.flatMap(m => m.content).filter((b: any) => b.type === 'tool_use').map((b: any) => b.id)
+    expect(ids.sort()).toEqual(uses.sort())
+  })
 })

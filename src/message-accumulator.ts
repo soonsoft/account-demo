@@ -47,6 +47,22 @@ export class MessageAccumulator {
     }
   }
 
-  /** run 结束时调用：覆盖 max_turns 退出路径。 */
-  finalize(): void { this.flush() }
+  /** run 结束时调用：覆盖 max_turns/abort 退出路径——先补齐悬空 tool_use，再 flush。 */
+  finalize(): void {
+    // abort 窗口：assistant 消息已 push、但其 tool_use 没全部执行完 → 留下无配对 tool_result 的
+    // tool_use，部分 provider 下轮会拒。为每个悬空 tool_use 合成 is_error 的 tool_result。
+    // 配对检查要覆盖已 flush 的历史 + 尚在 pending 的全部 tool_result（否则已配对的会被补重）。
+    const unpaired = new Set(
+      this.messages.flatMap(m => m.content)
+        .filter((b): b is Extract<ContentBlock, { type: 'tool_use' }> => b.type === 'tool_use')
+        .map(b => b.id),
+    )
+    for (const b of [...this.messages.flatMap(m => m.content), ...this.pending]) {
+      if (b.type === 'tool_result') unpaired.delete(b.tool_use_id)
+    }
+    for (const id of unpaired) {
+      this.pending.push({ type: 'tool_result', tool_use_id: id, content: [{ type: 'text', text: 'aborted: tool_use did not complete before the run ended' }], is_error: true })
+    }
+    this.flush()
+  }
 }
