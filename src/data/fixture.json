@@ -1,0 +1,42 @@
+{
+  "parties": [
+    { "party_id": 1001, "party_type": "INDIVIDUAL", "kyc_status": "APPROVED", "risk_level": "LOW", "is_pep": false, "created_at": "2022-06-01T00:00:00Z", "updated_at": "2024-01-10T00:00:00Z" },
+    { "party_id": 1002, "party_type": "INDIVIDUAL", "kyc_status": "PENDING", "risk_level": "MEDIUM", "is_pep": false, "created_at": "2024-03-20T00:00:00Z", "updated_at": "2024-03-20T00:00:00Z" },
+    { "party_id": 1003, "party_type": "INDIVIDUAL", "kyc_status": "APPROVED", "risk_level": "HIGH", "is_pep": true, "created_at": "2021-11-05T00:00:00Z", "updated_at": "2024-02-01T00:00:00Z" },
+    { "party_id": 1004, "party_type": "INDIVIDUAL", "kyc_status": "REJECTED", "risk_level": "LOW", "is_pep": false, "created_at": "2023-09-12T00:00:00Z", "updated_at": "2023-09-15T00:00:00Z" },
+    { "party_id": 2001, "party_type": "ORGANIZATION", "kyc_status": "APPROVED", "risk_level": "MEDIUM", "is_pep": false, "created_at": "2020-03-10T00:00:00Z", "updated_at": "2023-12-01T00:00:00Z" },
+    { "party_id": 2002, "party_type": "ORGANIZATION", "kyc_status": "PENDING", "risk_level": "HIGH", "is_pep": false, "created_at": "2024-05-01T00:00:00Z", "updated_at": "2024-05-01T00:00:00Z" }
+  ],
+  "individuals": [
+    { "party_id": 1001, "first_name": "Alice", "last_name": "Chen", "nationality": "CN", "occupation": "Software Engineer" },
+    { "party_id": 1002, "first_name": "Bob", "last_name": "Smith", "nationality": "US", "occupation": "Teacher" },
+    { "party_id": 1003, "first_name": "Carol", "last_name": "Wong", "nationality": "SG", "occupation": "Politician" },
+    { "party_id": 1004, "first_name": "Dave", "last_name": "Lee", "nationality": "US", "occupation": "Designer" }
+  ],
+  "organizations": [
+    { "party_id": 2001, "legal_name": "Acme Inc", "business_name": "Acme", "registration_number": "REG001", "tax_id": "TAX001", "date_of_incorporation": "2010-01-01", "registered_capital": 1000000, "legal_representative": "Alice Chen" },
+    { "party_id": 2002, "legal_name": "Globex Corp", "business_name": "Globex", "registration_number": "REG002", "tax_id": "TAX002", "date_of_incorporation": "2018-06-15", "registered_capital": 5000000, "legal_representative": "Carol Wong" }
+  ],
+  "accounts": [
+    { "account_id": 5001, "account_number": "ACC-5001", "account_type": "CHECKING", "currency_code": "USD", "status": "ACTIVE", "current_balance": 12000, "available_balance": 11500, "opened_at": "2023-01-15T00:00:00Z" },
+    { "account_id": 5002, "account_number": "ACC-5002", "account_type": "SAVINGS", "currency_code": "USD", "status": "ACTIVE", "current_balance": 50000, "available_balance": 48000, "opened_at": "2022-06-01T00:00:00Z" },
+    { "account_id": 5003, "account_number": "ACC-5003", "account_type": "CREDIT_CARD", "currency_code": "USD", "status": "ACTIVE", "current_balance": -1500, "available_balance": 8500, "opened_at": "2024-02-20T00:00:00Z" },
+    { "account_id": 5004, "account_number": "ACC-5004", "account_type": "CHECKING", "currency_code": "CNY", "status": "DORMANT", "current_balance": 3000, "available_balance": 3000, "opened_at": "2020-03-10T00:00:00Z" },
+    { "account_id": 5005, "account_number": "ACC-5005", "account_type": "SAVINGS", "currency_code": "USD", "status": "FROZEN", "current_balance": 200000, "available_balance": 0, "opened_at": "2021-11-05T00:00:00Z" }
+  ],
+  "account_holder_relations": [
+    { "relation_id": 1, "account_id": 5001, "party_id": 1001, "role": "PRIMARY_OWNER", "permissions": { "view": true, "transfer": true, "withdraw": true } },
+    { "relation_id": 2, "account_id": 5002, "party_id": 1001, "role": "PRIMARY_OWNER", "permissions": { "view": true, "transfer": true, "withdraw": true } },
+    { "relation_id": 3, "account_id": 5002, "party_id": 1002, "role": "SECONDARY_OWNER", "permissions": { "view": true, "transfer": false, "withdraw": false } },
+    { "relation_id": 4, "account_id": 5003, "party_id": 1003, "role": "PRIMARY_OWNER", "permissions": { "view": true, "transfer": true, "withdraw": true } },
+    { "relation_id": 5, "account_id": 5004, "party_id": 2001, "role": "PRIMARY_OWNER", "permissions": { "view": true, "transfer": true, "withdraw": false } },
+    { "relation_id": 6, "account_id": 5005, "party_id": 2002, "role": "PRIMARY_OWNER", "permissions": { "view": true, "transfer": true, "withdraw": true } }
+  ],
+  "bank_cards": [
+    { "card_id": 9001, "account_id": 5001, "last4": "4242", "card_holder_name": "ALICE CHEN", "card_type": "DEBIT", "brand": "VISA", "status": "ACTIVE" },
+    { "card_id": 9002, "account_id": 5002, "last4": "1111", "card_holder_name": "ALICE CHEN", "card_type": "DEBIT", "brand": "MASTERCARD", "status": "ACTIVE" },
+    { "card_id": 9003, "account_id": 5003, "last4": "8888", "card_holder_name": "CAROL WONG", "card_type": "CREDIT", "brand": "UNIONPAY", "status": "ACTIVE" },
+    { "card_id": 9004, "account_id": 5004, "last4": "3333", "card_holder_name": "ACME INC", "card_type": "DEBIT", "brand": "UNIONPAY", "status": "ACTIVE" },
+    { "card_id": 9005, "account_id": 5005, "last4": "9999", "card_holder_name": "GLOBEX CORP", "card_type": "CREDIT", "brand": "VISA", "status": "BLOCKED" }
+  ]
+}
