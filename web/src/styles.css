@@ -10,7 +10,21 @@ body { margin: 0; background: #14161a; color: #e6e6e6; font-family: system-ui, s
 .app { display: flex; flex-direction: column; height: 100vh; }
 header { padding: 8px 16px; background: #1d2026; border-bottom: 1px solid #2a2e35; }
 header .gw { color: #7f8989; font-size: 12px; margin-left: 12px; }
-.main { display: flex; flex: 1; min-height: 0; }
+.body { display: flex; flex: 1; min-height: 0; }
+.center { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
+.nav { width: 200px; flex: none; background: #17191e; border-right: 1px solid #2a2e35; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
+.nav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; color: #b7bdc9; }
+.nav-item.active { background: #243046; color: #fff; }
+.nav-item > button { background: none; border: none; color: inherit; cursor: pointer; text-align: left; padding: 0; font: inherit; }
+.nav-link { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-del { flex: none; opacity: 0; color: #7f8989; }
+.nav-item:hover .nav-del { opacity: 1; }
+.nav-del:hover { color: #e06c6c; }
+.nav-sep { border: none; border-top: 1px solid #2a2e35; margin: 8px 0; }
+.nav-title { font-size: 11px; color: #7f8989; padding: 0 8px 4px; text-transform: uppercase; letter-spacing: .5px; }
+.nav-empty { font-size: 12px; color: #5c636e; padding: 4px 8px; }
+.save-btn { align-self: flex-end; margin: 0 16px 8px; padding: 4px 12px; background: #2a2e35; color: #cbd2dd; border: 1px solid #3a3f47; border-radius: 6px; cursor: pointer; font-size: 12px; }
+.save-btn:hover { background: #323843; }
 .chat { flex: 1; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
 /* 关键：滚动容器里的 flex 子项默认 flex-shrink:1 —— 消息一多，表格/气泡会被纵向压扁而不是撑出滚动条。 */
 .chat > * { flex-shrink: 0; }

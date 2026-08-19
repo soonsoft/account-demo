@@ -3,9 +3,9 @@ import type { AgentEvent, Message } from '@agent-lite/core'
 import { runSession } from '../../src/agent'
 import { SCENARIOS } from '../../src/scenarios'
 import { chatItemFromEvent, type ChatItem, stepItemFromEvent, newRunGroup, type RunGroup } from './events'
-import { ChatPanel } from './components/ChatPanel'
+import { ChatView } from './components/ChatView'
+import { Nav } from './components/Nav'
 import { StepsPanel } from './components/StepsPanel'
-import { Composer } from './components/Composer'
 import './styles.css'
 
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL as string | undefined) ?? 'http://127.0.0.1:3000/llm'
@@ -49,11 +49,11 @@ export function App() {
   return (
     <div className="app">
       <header>account-demo <span className="gw">{GATEWAY_URL}</span></header>
-      <div className="main">
-        <ChatPanel items={chat} running={running} />
+      <div className="body">
+        <Nav shortcuts={[]} activeView="chat" onSelectChat={() => {}} onSelectShortcut={() => {}} onDeleteShortcut={() => {}} />
+        <ChatView items={chat} running={running} showSave={false} onSave={() => {}} onSend={send} onStop={stop} scenarios={SCENARIOS} />
         <StepsPanel groups={groups} />
       </div>
-      <Composer running={running} onSend={send} onStop={stop} scenarios={SCENARIOS} />
     </div>
   )
 }
