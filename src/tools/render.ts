@@ -15,8 +15,11 @@ export const renderTableTool: Tool = {
   inputSchema: {
     type: 'object',
     properties: {
-      from: { type: 'array', items: { type: 'string' }, description: '引用数组，如 ["t1.accounts"]' },
+      from: { type: 'array', items: { type: 'string' }, description: '引用数组，如 ["t1.accounts"] 或复数 ["query_party_details[].party"]' },
       columns: { type: 'array', items: { type: 'object', properties: { path: { type: 'string' }, title: { type: 'string' } }, required: ['path'] } },
+      orderBy: { type: 'string', description: '排序字段 path（缺值沉底；数值按数值比）。如 opened_at' },
+      order: { type: 'string', enum: ['asc', 'desc'], description: '排序方向，默认 asc' },
+      limit: { type: 'integer', description: '只保留前 N 行（配合 orderBy 用，如最早/最新/前几条）' },
       title: { type: 'string', description: '表标题(caption)' },
     },
     required: ['from', 'columns'],
