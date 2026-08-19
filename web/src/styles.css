@@ -64,3 +64,11 @@ header .gw { color: #7f8989; font-size: 12px; margin-left: 12px; }
 .composer button { padding: 8px 16px; border: none; border-radius: 8px; background: #2b4a7a; color: #fff; cursor: pointer; }
 .composer select { background: #14161a; color: inherit; border: 1px solid #2a2e35; border-radius: 8px; padding: 8px; }
 .composer button:disabled { opacity: .5; cursor: default; }
+.shortcut-view { padding: 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; align-items: flex-start; }
+.shortcut-view h2 { margin: 0; }
+.sv-meta { margin: 0; display: grid; grid-template-columns: auto 1fr; gap: 6px 16px; }
+.sv-meta dt { color: #8f96a3; } .sv-meta dd { margin: 0; overflow-wrap: anywhere; }
+.sv-note { color: #8f96a3; font-size: 12px; }
+.sv-run { padding: 8px 20px; border: none; border-radius: 8px; background: #2b4a7a; color: #fff; cursor: pointer; }
+.sv-run:disabled { opacity: .5; cursor: default; }
+.sv-empty { color: #5c636e; padding: 24px; }

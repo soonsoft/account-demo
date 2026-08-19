@@ -1,11 +1,14 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { AgentEvent, Message } from '@agent-lite/core'
+import type { ShortcutRecord } from '@agent-lite/core/shortcut'
 import { runSession } from '../../src/agent'
 import { SCENARIOS } from '../../src/scenarios'
 import { chatItemFromEvent, type ChatItem, stepItemFromEvent, newRunGroup, type RunGroup } from './events'
 import { ChatView } from './components/ChatView'
+import { ShortcutView } from './components/ShortcutView'
 import { Nav } from './components/Nav'
 import { StepsPanel } from './components/StepsPanel'
+import { listShortcuts, deleteShortcut } from './shortcut'
 import './styles.css'
 
 const GATEWAY_URL = (import.meta.env.VITE_GATEWAY_URL as string | undefined) ?? 'http://127.0.0.1:3000/llm'
@@ -16,6 +19,11 @@ export function App() {
   const [groups, setGroups] = useState<RunGroup[]>([])             // 步骤面板：按交互分组
   const [running, setRunning] = useState(false)
   const acRef = useRef<AbortController | null>(null)
+  const [shortcuts, setShortcuts] = useState<ShortcutRecord[]>([])  // IndexedDB 里的 shortcut 记录
+  const [view, setView] = useState<'chat' | 'shortcut'>('chat')
+  const [activeShortcutId, setActiveShortcutId] = useState<string | undefined>()
+
+  useEffect(() => { listShortcuts().then(setShortcuts).catch(() => {}) }, [])
 
   const onEvent = useCallback((e: AgentEvent) => {
     const ci = chatItemFromEvent(e); if (ci) setChat(c => [...c, ci])
@@ -46,12 +54,23 @@ export function App() {
 
   const stop = useCallback(() => acRef.current?.abort(), [])
 
+  const selectChat = () => setView('chat')
+  const selectShortcut = (id: string) => { setActiveShortcutId(id); setView('shortcut') }
+  const removeShortcut = async (id: string) => {
+    if (!window.confirm('删除该 shortcut？')) return
+    await deleteShortcut(id)
+    setShortcuts(await listShortcuts())
+    if (activeShortcutId === id) { setActiveShortcutId(undefined); setView('chat') }   // 删当前打开的 → 回退对话 view
+  }
+
   return (
     <div className="app">
       <header>account-demo <span className="gw">{GATEWAY_URL}</span></header>
       <div className="body">
-        <Nav shortcuts={[]} activeView="chat" onSelectChat={() => {}} onSelectShortcut={() => {}} onDeleteShortcut={() => {}} />
-        <ChatView items={chat} running={running} showSave={false} onSave={() => {}} onSend={send} onStop={stop} scenarios={SCENARIOS} />
+        <Nav shortcuts={shortcuts} activeView={view} activeShortcutId={activeShortcutId} onSelectChat={selectChat} onSelectShortcut={selectShortcut} onDeleteShortcut={removeShortcut} />
+        {view === 'chat'
+          ? <ChatView items={chat} running={running} showSave={false} onSave={() => {}} onSend={send} onStop={stop} scenarios={SCENARIOS} />
+          : <ShortcutView record={shortcuts.find(s => s.id === activeShortcutId)} running={running} onReplay={() => {}} />}
         <StepsPanel groups={groups} />
       </div>
     </div>
