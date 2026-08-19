@@ -91,7 +91,7 @@ export function App() {
   }, [running])
 
   const selectChat = () => setView('chat')
-  const selectShortcut = (id: string) => { setActiveShortcutId(id); setView('shortcut') }
+  const selectShortcut = (id: string) => { setActiveShortcutId(id); setReplayOutput([]); setView('shortcut') }   // 切换即清空：回放结果属于当前条，不跨条残留
   const removeShortcut = async (id: string) => {
     if (!window.confirm('删除该 shortcut？')) return
     await deleteShortcut(id)
