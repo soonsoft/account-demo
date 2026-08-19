@@ -13,7 +13,7 @@ header .gw { color: #7f8989; font-size: 12px; margin-left: 12px; }
 .body { display: flex; flex: 1; min-height: 0; }
 .center { flex: 1; min-width: 0; display: flex; flex-direction: column; position: relative; }
 .nav { width: 200px; flex: none; background: #17191e; border-right: 1px solid #2a2e35; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; overflow-y: auto; }
-.nav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; color: #b7bdc9; }
+.nav-item { display: flex; align-items: center; justify-content: space-between; padding: 6px 8px; border-radius: 6px; color: #b7bdc9; border: none; background: none; cursor: pointer; text-align: left; font: inherit; }
 .nav-item.active { background: #243046; color: #fff; }
 .nav-item > button { background: none; border: none; color: inherit; cursor: pointer; text-align: left; padding: 0; font: inherit; }
 .nav-link { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -68,6 +68,8 @@ header .gw { color: #7f8989; font-size: 12px; margin-left: 12px; }
 .step.err { color: #e06c6c; }
 .composer { display: flex; gap: 8px; padding: 12px; background: #1d2026; border-top: 1px solid #2a2e35; }
 .composer input { flex: 1; padding: 8px 12px; background: #14161a; color: inherit; border: 1px solid #2a2e35; border-radius: 8px; }
+/* 焦点：去默认 outline（粗描边），1px 边框换主题色 */
+.composer input:focus, .save-row input:focus { outline: none; border-color: #2b4a7a; }
 .composer button { padding: 8px 16px; border: none; border-radius: 8px; background: #2b4a7a; color: #fff; cursor: pointer; }
 .composer select { background: #14161a; color: inherit; border: 1px solid #2a2e35; border-radius: 8px; padding: 8px; }
 .composer button:disabled { opacity: .5; cursor: default; }
