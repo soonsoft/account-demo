@@ -65,9 +65,7 @@ export function App() {
 
   const stop = useCallback(() => acRef.current?.abort(), [])
 
-  const saveShortcutFromLastRun = useCallback(async () => {
-    const name = window.prompt('shortcut 名称', lastPromptRef.current.slice(0, 12) || 'shortcut')
-    if (!name) return
+  const saveShortcutFromLastRun = useCallback(async (name: string) => {
     const rec = recordShortcut(lastEventsRef.current, name, lastPromptRef.current)
     await saveShortcut(rec)
     setShortcuts(await listShortcuts())
@@ -101,7 +99,7 @@ export function App() {
       <div className="body">
         <Nav shortcuts={shortcuts} activeView={view} activeShortcutId={activeShortcutId} onSelectChat={selectChat} onSelectShortcut={selectShortcut} onDeleteShortcut={removeShortcut} />
         {view === 'chat'
-          ? <ChatView items={chat} running={running} showSave={lastRunCompleted && !running} onSave={saveShortcutFromLastRun} onSend={send} onStop={stop} scenarios={SCENARIOS}>{toast && <div className="toast">{toast}</div>}</ChatView>
+          ? <ChatView items={chat} running={running} showSave={lastRunCompleted && !running} onSave={saveShortcutFromLastRun} defaultName={lastPromptRef.current.slice(0, 12) || 'shortcut'} onSend={send} onStop={stop} scenarios={SCENARIOS}>{toast && <div className="toast">{toast}</div>}</ChatView>
           : <ShortcutView record={shortcuts.find(s => s.id === activeShortcutId)} running={running} onReplay={() => { const rec = shortcuts.find(s => s.id === activeShortcutId); if (rec) runReplay(rec) }} />}
         <StepsPanel groups={groups} />
       </div>
