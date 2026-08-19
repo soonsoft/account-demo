@@ -66,6 +66,22 @@ describe('render_table + buildTools', () => {
     expect(presented).toContain('CHECKING')
     expect(r.toLLM?.[0]).toMatchObject({ type: 'text' })
   })
+  it('render_table passes orderBy/order/limit through to the renderer (top-N end-to-end)', async () => {
+    const tools = buildTools()
+    const renderTable = tools.find(t => t.name === 'render_table')!
+    const rows = [{ n: 'c', d: '2024-01-01' }, { n: 'a', d: '2022-01-01' }, { n: 'b', d: '2023-01-01' }]
+    let presented = ''
+    const ctx: any = {
+      toolUseId: 't3', phase: 'render', signal: new AbortController().signal,
+      resolve: (ref: string) => (ref === 'query_account_details[].account' ? rows : undefined),
+      present: (html: string) => { presented = html },
+    }
+    const r = await renderTable.execute({ from: ['query_account_details[].account'], orderBy: 'd', limit: 2, columns: [{ path: 'n' }] }, ctx)
+    expect(presented).toContain('a')                       // 最早的
+    expect(presented).toContain('b')                       // 第二早
+    expect(presented).not.toContain('>c<')                 // 被_limit 砍掉
+    expect(JSON.stringify(r.toLLM)).toContain('rendered 2 rows')   // 回显选行后的真实行数
+  })
 })
 
 describe('render_detail defensive checks + buildTools', () => {

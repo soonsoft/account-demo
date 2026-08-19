@@ -26,15 +26,21 @@ export const renderTableTool: Tool = {
   },
   responseSchema: { type: 'object', properties: { rendered: { type: 'number' } } },
   async execute(input, ctx) {
-    const { from, columns, title } = input as { from: string[]; columns: { path: string; title?: string }[]; title?: string }
+    const { from, columns, title, orderBy, order, limit } = input as {
+      from: string[]; columns: { path: string; title?: string }[]; title?: string
+      orderBy?: string; order?: 'asc' | 'desc'; limit?: number
+    }
     // 多 id 合并：每个 ref 解析为一个行源(数组)，按序拼接
     const rows = from.flatMap(ref => {
       const v = ctx.resolve(ref)
       return Array.isArray(v) ? v : (v == null ? [] : [v])
     })
-    const html = registry.render('render_table', rows, { columns, title })
+    const html = registry.render('render_table', rows, { columns, title, orderBy, order, limit })
     ctx.present?.(html)
-    return { toLLM: [{ type: 'text', text: `rendered ${rows.length} rows` }] }
+    // 选行发生在 renderer 内部；从产出 HTML 数 <tr> 得到真实行数（减 thead 一行），
+    // 否则 limit 后回给模型的 rows 数是选行前的，模型会误判 limit 没生效。
+    const trCount = Math.max(0, (html.match(/<tr>/g) ?? []).length - 1)
+    return { toLLM: [{ type: 'text', text: `rendered ${trCount} rows` }] }
   },
 }
 
