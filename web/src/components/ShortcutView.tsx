@@ -1,5 +1,6 @@
 import type { ShortcutRecord } from '@agent-lite/core/shortcut'
-export function ShortcutView({ record, running, onReplay }: { record?: ShortcutRecord; running: boolean; onReplay(): void }) {
+import type { ChatItem } from '../events'
+export function ShortcutView({ record, running, output, onReplay }: { record?: ShortcutRecord; running: boolean; output: ChatItem[]; onReplay(): void }) {
   if (!record) return <section className="center shortcut-view"><div className="sv-empty">shortcut 不存在（可能已删除）</div></section>
   return (
     <section className="center shortcut-view">
@@ -11,6 +12,15 @@ export function ShortcutView({ record, running, onReplay }: { record?: ShortcutR
       </dl>
       <div className="sv-note">回放零 LLM：直接按录制的工具序列重查 live 数据并渲染。</div>
       <button className="sv-run" onClick={onReplay} disabled={running}>{running ? '回放中…' : '▶ 回放'}</button>
+      {output.length > 0 && (
+        <div className="sv-output">
+          {output.map((it, i) => {
+            if (it.kind === 'render') return <div key={i} className="render" dangerouslySetInnerHTML={{ __html: it.html }} />
+            if (it.kind === 'assistant') return <div key={i} className="sv-text">{it.text}</div>
+            return <div key={i} className="status">{it.text}</div>
+          })}
+        </div>
+      )}
     </section>
   )
 }

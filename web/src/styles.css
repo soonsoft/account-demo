@@ -81,3 +81,6 @@ header .gw { color: #7f8989; font-size: 12px; margin-left: 12px; }
 .sv-run { padding: 8px 20px; border: none; border-radius: 8px; background: #2b4a7a; color: #fff; cursor: pointer; }
 .sv-run:disabled { opacity: .5; cursor: default; }
 .sv-empty { color: #5c636e; padding: 24px; }
+/* 回放输出：就地渲染在按钮下方（复用 .render 表格样式；容器限宽可滚） */
+.sv-output { margin-top: 12px; padding-top: 12px; border-top: 1px solid #2a2e35; width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.sv-text { white-space: pre-wrap; overflow-wrap: anywhere; }

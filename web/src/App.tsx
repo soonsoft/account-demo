@@ -28,6 +28,7 @@ export function App() {
   const modeRef = useRef<'chat' | 'replay'>('chat')
   const [lastRunCompleted, setLastRunCompleted] = useState(false)
   const [toast, setToast] = useState('')
+  const [replayOutput, setReplayOutput] = useState<ChatItem[]>([])   // 回放输出就地渲染（shortcut view 内），不进对话时间线
 
   useEffect(() => { listShortcuts().then(setShortcuts).catch(() => {}) }, [])
 
@@ -74,15 +75,20 @@ export function App() {
 
   const runReplay = useCallback(async (record: ShortcutRecord) => {
     if (running) return
-    setView('chat')                                                 // 输出在共享时间线看（spec 消歧）
+    setReplayOutput([])                                             // 就地渲染：输出留在 shortcut view，不进对话时间线
     setGroups(gs => [...gs, newRunGroup(`⚡ ${record.name}（回放，零 LLM）`)])
     setRunning(true); modeRef.current = 'replay'; acRef.current = new AbortController()
     try {
-      for await (const e of replayShortcut(record, acRef.current.signal)) onEvent(e)
+      for await (const e of replayShortcut(record, acRef.current.signal)) {
+        if (e.type === 'text') setReplayOutput(o => [...o, { kind: 'assistant', text: e.text }])
+        else if (e.type === 'present') setReplayOutput(o => [...o, { kind: 'render', html: e.html }])
+        else if (e.type === 'error') setReplayOutput(o => [...o, { kind: 'status', text: `⚠ ${(e.error as Error).message.slice(0, 120)}` }])
+        else if (e.type === 'done') setReplayOutput(o => [...o, { kind: 'status', text: e.reason === 'completed' ? '✓ 回放完成' : `⚠ ${e.reason}` }])
+      }
     } catch (e) {
-      setChat(c => [...c, { kind: 'status', text: `⚠ 回放异常：${(e as Error).message}` }])
+      setReplayOutput(o => [...o, { kind: 'status', text: `⚠ 回放异常：${(e as Error).message}` }])
     } finally { setRunning(false); acRef.current = null }
-  }, [running, onEvent])
+  }, [running])
 
   const selectChat = () => setView('chat')
   const selectShortcut = (id: string) => { setActiveShortcutId(id); setView('shortcut') }
@@ -100,7 +106,7 @@ export function App() {
         <Nav shortcuts={shortcuts} activeView={view} activeShortcutId={activeShortcutId} onSelectChat={selectChat} onSelectShortcut={selectShortcut} onDeleteShortcut={removeShortcut} />
         {view === 'chat'
           ? <ChatView items={chat} running={running} showSave={lastRunCompleted && !running} onSave={saveShortcutFromLastRun} defaultName={lastPromptRef.current.slice(0, 12) || 'shortcut'} onSend={send} onStop={stop} scenarios={SCENARIOS}>{toast && <div className="toast">{toast}</div>}</ChatView>
-          : <ShortcutView record={shortcuts.find(s => s.id === activeShortcutId)} running={running} onReplay={() => { const rec = shortcuts.find(s => s.id === activeShortcutId); if (rec) runReplay(rec) }} />}
+          : <ShortcutView record={shortcuts.find(s => s.id === activeShortcutId)} running={running} output={replayOutput} onReplay={() => { const rec = shortcuts.find(s => s.id === activeShortcutId); if (rec) runReplay(rec) }} />}
         <StepsPanel groups={groups} />
       </div>
     </div>
